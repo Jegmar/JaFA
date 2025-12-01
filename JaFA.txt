@@ -1,0 +1,12 @@
+SUGOD
+entero age = 18, score = 95.
+entero solve = 2 * (2+5).
+
+printa("Your age is: ", age).
+printa("Next year: ", age + 1).
+age addset 1.
+printa("Happy birthday! Now you are ", age).
+printa("Double score: ", score * 2).
+printa("Welcome to JaFA 2025!").
+
+HUMAN END

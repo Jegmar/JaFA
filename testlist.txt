@@ -1,0 +1,59 @@
+SUGOD
+entero age = 18, score = 95.
+
+printa("Your age is: ", age).
+printa("Next year: ", age + 1).
+age addset 1.
+printa("Happy birthday! Now you are ", age).
+printa("Double score: ", score * 2).
+printa("Welcome to JaFA 2025!").
+
+HUMAN END
+
+printa("Your age is: ", age, " Congrats.").
+
+SUGOD
+entero a = 5, b = 10.
+
+printa("Values: ", a, ", ", b).
+
+HUMAN
+END
+
+SUGOD
+entero age = 18.
+letra initial = 'J'.
+
+printa("Age: ", age).
+printa("Initial: ", initial).
+
+age addset 1.
+initial addset 1.
+
+printa("Next age: ", age).
+printa("Next initial: ", initial).
+
+HUMAN
+END
+
+SUGOD
+entero age  = 10.
+letra name = 'J'.
+
+printa("age: ", age).
+printa("codename: ", name).
+
+HUMAN END
+
+SUGOD
+
+entero age = 9.
+entero a = 2 * (4+5).
+entero c = 5.
+
+printa("Hi").
+printa("age: ", age).
+printa("a: ", a).
+printa("c: ", c + 5).
+
+HUMAN END
