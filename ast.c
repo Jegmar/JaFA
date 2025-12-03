@@ -21,12 +21,20 @@ Expr* mk_var(const char *name) {
 
 /* --- Create binary operator node --- */
 Expr* mk_bin(ExprKind kind, Expr *left, Expr *right) {
-    Expr *e = (Expr*)malloc(sizeof(Expr));
-    e->kind = kind;
-    e->left = left;
-    e->right = right;
-    return e;
+    // Check types
+    // if (left->expr_type != EXPR_INT || right->expr_type != EXPR_INT) {
+    //     fprintf(stderr, "Semantic error: Cannot use char operand in arithmetic expression.\n");
+    //     exit(1);
+    // }
+
+    Expr *expr = malloc(sizeof(Expr));
+    expr->kind = kind;
+    expr->left = left;
+    expr->right = right;
+    expr->expr_type = EXPR_INT; // result of arithmetic is always int
+    return expr;
 }
+
 
 /* --- Free AST recursively --- */
 void free_expr(Expr *expr) {

@@ -110,23 +110,45 @@ item : NAME
            free($1); 
        }
      | NAME SET value
-       { 
-           if(!parse_success) YYABORT;
+        {
+            if(!parse_success) YYABORT;
 
-           int idx = find_var($1);
-           if(idx == -1) idx = add_var($1, current_type);
+            /* Look up variable */
+            int idx = find_var($1);
 
-           /* Evaluate expression and store in symbol table */
-           int val = eval_expr($3);
-           sym_table[idx].value = val;
+            if(idx == -1) {
+                /* variable not declared, declare automatically */
+                idx = add_var($1, current_type);
+            }
 
-           /* Generate assembly code */
-           if(current_type == TYPE_INT) generate_entero_with_expr($1, $3);
-           else if(current_type == TYPE_CHAR) generate_letra_with_expr($1, $3);
+            /* TYPE CHECKING */
+            int var_type = sym_table[idx].type;
+            ExprType expr_type = $3->expr_type;
 
-           free($1);
-           free_expr($3);
-       }
+            // Pass the expression type to the semantic checker
+            check_assignment_type(sym_table[idx].type, $3->expr_type, $1, yylineno);
+
+
+            /* Recursive type check for arithmetic expressions:
+            - Ensure INT variables do not use CHAR variables in any part of the expression */
+            if(var_type == TYPE_INT) {
+                check_expr_type($3, TYPE_INT);   // Will abort if any CHAR variable is used
+            }
+
+            /* Evaluate expression */
+            int val = eval_expr($3);
+            sym_table[idx].value = val;
+
+            /* Generate assembly */
+            if (var_type == TYPE_INT)
+                generate_entero_with_expr($1, $3);
+            else
+                generate_letra_with_expr($1, $3);
+
+            free($1);
+            free_expr($3);
+        }
+
 ;
 
 
@@ -211,8 +233,16 @@ factor  : base { $$ = $1; }
         | factor MUL base { $$ = mk_bin(EX_MUL, $1, $3); }
         | factor DIV base { $$ = mk_bin(EX_DIV, $1, $3); }
 
-base : NUM_VAL     { $$ = mk_const($1); }
-     | CHAR_VAL    { $$ = mk_const((int)$1); }
+base : NUM_VAL
+        {
+            $$ = mk_const($1);
+            $$->expr_type = EXPR_INT;
+        }
+     | CHAR_VAL    
+        {
+            $$ = mk_const($1);    
+            $$->expr_type = EXPR_CHAR;
+        }
      | NAME
          { check_undefined($1, yylineno); $$ = mk_var($1); free($1); }
      | L_PAREN value R_PAREN { $$ = $2; }
@@ -222,7 +252,7 @@ base : NUM_VAL     { $$ = mk_const($1); }
 
 void yyerror(const char *s) {
     parse_success = 0;
-    fprintf(stderr, "Error at line %d: %s\n", yylineno, s);
+    fprintf(stderr, "\nError at line %d: %s\n", yylineno, s);
 }
 
 int main() {

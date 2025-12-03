@@ -14,6 +14,11 @@ typedef enum {
     EX_DIV
 } ExprKind;
 
+typedef enum {
+    EXPR_INT,
+    EXPR_CHAR
+} ExprType;
+
 /* --- Expression AST node --- */
 typedef struct Expr {
     ExprKind kind;
@@ -23,6 +28,7 @@ typedef struct Expr {
         int value;          // for EX_CONST
         char *name;         // for EX_VAR
     };
+    ExprType expr_type;
 } Expr;
 
 

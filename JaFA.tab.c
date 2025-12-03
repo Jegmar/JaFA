@@ -512,10 +512,10 @@ static const yytype_int8 yyrhs[] =
 static const yytype_uint8 yyrline[] =
 {
        0,    77,    77,    80,    81,    83,    84,    85,    86,    87,
-      89,    90,    91,    93,    94,    96,   112,   133,   151,   152,
-     153,   154,   155,   157,   159,   163,   164,   167,   189,   198,
-     202,   204,   206,   207,   208,   210,   211,   212,   214,   215,
-     216,   218,   219
+      89,    90,    91,    93,    94,    96,   112,   155,   173,   174,
+     175,   176,   177,   179,   181,   185,   186,   189,   211,   220,
+     224,   226,   228,   229,   230,   232,   233,   234,   236,   241,
+     246,   248,   249
 };
 #endif
 
@@ -1501,29 +1501,50 @@ yyreduce:
 
 /* Line 1455 of yacc.c  */
 #line 113 "JaFA.y"
-    { 
-           if(!parse_success) YYABORT;
+    {
+            if(!parse_success) YYABORT;
 
-           int idx = find_var((yyvsp[(1) - (3)].id));
-           if(idx == -1) idx = add_var((yyvsp[(1) - (3)].id), current_type);
+            /* Look up variable */
+            int idx = find_var((yyvsp[(1) - (3)].id));
 
-           /* Evaluate expression and store in symbol table */
-           int val = eval_expr((yyvsp[(3) - (3)].expr));
-           sym_table[idx].value = val;
+            if(idx == -1) {
+                /* variable not declared, declare automatically */
+                idx = add_var((yyvsp[(1) - (3)].id), current_type);
+            }
 
-           /* Generate assembly code */
-           if(current_type == TYPE_INT) generate_entero_with_expr((yyvsp[(1) - (3)].id), (yyvsp[(3) - (3)].expr));
-           else if(current_type == TYPE_CHAR) generate_letra_with_expr((yyvsp[(1) - (3)].id), (yyvsp[(3) - (3)].expr));
+            /* TYPE CHECKING */
+            int var_type = sym_table[idx].type;
+            ExprType expr_type = (yyvsp[(3) - (3)].expr)->expr_type;
 
-           free((yyvsp[(1) - (3)].id));
-           free_expr((yyvsp[(3) - (3)].expr));
-       ;}
+            // Pass the expression type to the semantic checker
+            check_assignment_type(sym_table[idx].type, (yyvsp[(3) - (3)].expr)->expr_type, (yyvsp[(1) - (3)].id), yylineno);
+
+
+            /* Recursive type check for arithmetic expressions:
+            - Ensure INT variables do not use CHAR variables in any part of the expression */
+            if(var_type == TYPE_INT) {
+                check_expr_type((yyvsp[(3) - (3)].expr), TYPE_INT);   // Will abort if any CHAR variable is used
+            }
+
+            /* Evaluate expression */
+            int val = eval_expr((yyvsp[(3) - (3)].expr));
+            sym_table[idx].value = val;
+
+            /* Generate assembly */
+            if (var_type == TYPE_INT)
+                generate_entero_with_expr((yyvsp[(1) - (3)].id), (yyvsp[(3) - (3)].expr));
+            else
+                generate_letra_with_expr((yyvsp[(1) - (3)].id), (yyvsp[(3) - (3)].expr));
+
+            free((yyvsp[(1) - (3)].id));
+            free_expr((yyvsp[(3) - (3)].expr));
+        ;}
     break;
 
   case 17:
 
 /* Line 1455 of yacc.c  */
-#line 134 "JaFA.y"
+#line 156 "JaFA.y"
     {
              if(!parse_success) YYABORT;
              check_undefined((yyvsp[(1) - (3)].id), yylineno);
@@ -1545,56 +1566,56 @@ yyreduce:
   case 18:
 
 /* Line 1455 of yacc.c  */
-#line 151 "JaFA.y"
+#line 173 "JaFA.y"
     { (yyval.op) = SET; ;}
     break;
 
   case 19:
 
 /* Line 1455 of yacc.c  */
-#line 152 "JaFA.y"
+#line 174 "JaFA.y"
     { (yyval.op) = ADD_SET; ;}
     break;
 
   case 20:
 
 /* Line 1455 of yacc.c  */
-#line 153 "JaFA.y"
+#line 175 "JaFA.y"
     { (yyval.op) = SUB_SET; ;}
     break;
 
   case 21:
 
 /* Line 1455 of yacc.c  */
-#line 154 "JaFA.y"
+#line 176 "JaFA.y"
     { (yyval.op) = MUL_SET; ;}
     break;
 
   case 22:
 
 /* Line 1455 of yacc.c  */
-#line 155 "JaFA.y"
+#line 177 "JaFA.y"
     { (yyval.op) = DIV_SET; ;}
     break;
 
   case 23:
 
 /* Line 1455 of yacc.c  */
-#line 158 "JaFA.y"
+#line 180 "JaFA.y"
     { if(parse_success) append_output("\n"); ;}
     break;
 
   case 24:
 
 /* Line 1455 of yacc.c  */
-#line 160 "JaFA.y"
+#line 182 "JaFA.y"
     { if(parse_success) append_output("\n"); ;}
     break;
 
   case 27:
 
 /* Line 1455 of yacc.c  */
-#line 168 "JaFA.y"
+#line 190 "JaFA.y"
     {
         if(!parse_success) YYABORT;
 
@@ -1621,7 +1642,7 @@ yyreduce:
   case 28:
 
 /* Line 1455 of yacc.c  */
-#line 190 "JaFA.y"
+#line 212 "JaFA.y"
     { if(parse_success){
               char *s = (yyvsp[(1) - (1)].str);
               int len = strlen(s);
@@ -1635,105 +1656,111 @@ yyreduce:
   case 29:
 
 /* Line 1455 of yacc.c  */
-#line 199 "JaFA.y"
+#line 221 "JaFA.y"
     { if(parse_success) { char tmp[2] = {(yyvsp[(1) - (1)].ch),'\0'}; append_output(tmp); } ;}
     break;
 
   case 30:
 
 /* Line 1455 of yacc.c  */
-#line 202 "JaFA.y"
+#line 224 "JaFA.y"
     { free_expr((yyvsp[(1) - (1)].expr)); ;}
     break;
 
   case 31:
 
 /* Line 1455 of yacc.c  */
-#line 204 "JaFA.y"
+#line 226 "JaFA.y"
     { (yyval.expr) = (yyvsp[(1) - (1)].expr); ;}
     break;
 
   case 32:
 
 /* Line 1455 of yacc.c  */
-#line 206 "JaFA.y"
+#line 228 "JaFA.y"
     { (yyval.expr) = (yyvsp[(1) - (1)].expr); ;}
     break;
 
   case 33:
 
 /* Line 1455 of yacc.c  */
-#line 207 "JaFA.y"
+#line 229 "JaFA.y"
     { (yyval.expr) = mk_bin(EX_ADD, (yyvsp[(1) - (3)].expr), (yyvsp[(3) - (3)].expr)); ;}
     break;
 
   case 34:
 
 /* Line 1455 of yacc.c  */
-#line 208 "JaFA.y"
+#line 230 "JaFA.y"
     { (yyval.expr) = mk_bin(EX_SUB, (yyvsp[(1) - (3)].expr), (yyvsp[(3) - (3)].expr)); ;}
     break;
 
   case 35:
 
 /* Line 1455 of yacc.c  */
-#line 210 "JaFA.y"
+#line 232 "JaFA.y"
     { (yyval.expr) = (yyvsp[(1) - (1)].expr); ;}
     break;
 
   case 36:
 
 /* Line 1455 of yacc.c  */
-#line 211 "JaFA.y"
+#line 233 "JaFA.y"
     { (yyval.expr) = mk_bin(EX_MUL, (yyvsp[(1) - (3)].expr), (yyvsp[(3) - (3)].expr)); ;}
     break;
 
   case 37:
 
 /* Line 1455 of yacc.c  */
-#line 212 "JaFA.y"
+#line 234 "JaFA.y"
     { (yyval.expr) = mk_bin(EX_DIV, (yyvsp[(1) - (3)].expr), (yyvsp[(3) - (3)].expr)); ;}
     break;
 
   case 38:
 
 /* Line 1455 of yacc.c  */
-#line 214 "JaFA.y"
-    { (yyval.expr) = mk_const((yyvsp[(1) - (1)].num)); ;}
+#line 237 "JaFA.y"
+    {
+            (yyval.expr) = mk_const((yyvsp[(1) - (1)].num));
+            (yyval.expr)->expr_type = EXPR_INT;
+        ;}
     break;
 
   case 39:
 
 /* Line 1455 of yacc.c  */
-#line 215 "JaFA.y"
-    { (yyval.expr) = mk_const((int)(yyvsp[(1) - (1)].ch)); ;}
+#line 242 "JaFA.y"
+    {
+            (yyval.expr) = mk_const((yyvsp[(1) - (1)].ch));    
+            (yyval.expr)->expr_type = EXPR_CHAR;
+        ;}
     break;
 
   case 40:
 
 /* Line 1455 of yacc.c  */
-#line 217 "JaFA.y"
+#line 247 "JaFA.y"
     { check_undefined((yyvsp[(1) - (1)].id), yylineno); (yyval.expr) = mk_var((yyvsp[(1) - (1)].id)); free((yyvsp[(1) - (1)].id)); ;}
     break;
 
   case 41:
 
 /* Line 1455 of yacc.c  */
-#line 218 "JaFA.y"
+#line 248 "JaFA.y"
     { (yyval.expr) = (yyvsp[(2) - (3)].expr); ;}
     break;
 
   case 42:
 
 /* Line 1455 of yacc.c  */
-#line 219 "JaFA.y"
+#line 249 "JaFA.y"
     { Expr *zero = mk_const(0); (yyval.expr) = mk_bin(EX_SUB, zero, (yyvsp[(2) - (2)].expr)); ;}
     break;
 
 
 
 /* Line 1455 of yacc.c  */
-#line 1737 "JaFA.tab.c"
+#line 1764 "JaFA.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1945,12 +1972,12 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 221 "JaFA.y"
+#line 251 "JaFA.y"
 
 
 void yyerror(const char *s) {
     parse_success = 0;
-    fprintf(stderr, "Error at line %d: %s\n", yylineno, s);
+    fprintf(stderr, "\nError at line %d: %s\n", yylineno, s);
 }
 
 int main() {
