@@ -5,9 +5,12 @@
 #include "semantics.h"
 #include "jafa_compiler.h"
 #include "ast.h"   /* Make Expr visible */
+#include <ctype.h>
+
 
 int parse_success = 1; /* 1 = OK, 0 = error */
 int current_type = TYPE_INT;
+int last_token_is_operator = 0;
 
 extern int yylex();
 extern int yylineno;
@@ -42,6 +45,9 @@ extern char machine_buffer[];
 /* --- Use eval_expr from jafa_compiler.c --- */
 extern int eval_expr(Expr *e);
 
+/* For syntax error mess */
+extern char *yytext;
+
 %}
 
 /* THIS MAKES Expr VISIBLE TO %union */
@@ -57,6 +63,7 @@ extern int eval_expr(Expr *e);
     int op;
     Expr *expr;   /* Expression AST node */
 }
+
 
 %token SUGOD HUMAN END BAD_TOKEN
 %token INT_TYPE CHAR_TYPE
@@ -79,12 +86,14 @@ source : SUGOD flow HUMAN END
 
 flow : /* empty */
      | flow step
+     
 
-step : setup DOT
+step : display DOT { if (parse_success) append_output("\n"); }
+     | setup DOT
      | modify DOT
-     | display
      | compute DOT
-     | DOT
+     ;
+
 
 setup    : category batch
 category : INT_TYPE  { current_type = TYPE_INT; }
@@ -176,11 +185,10 @@ mode : SET     { $$ = SET; }
      | MUL_SET { $$ = MUL_SET; }
      | DIV_SET { $$ = DIV_SET; }
 
-display : SHOW L_PAREN R_PAREN DOT
-        { if(parse_success) append_output("\n"); }
-        | SHOW L_PAREN arg_list R_PAREN DOT
-        { if(parse_success) append_output("\n"); }
+display : SHOW L_PAREN R_PAREN
+        | SHOW L_PAREN arg_list R_PAREN
         ;
+;
 
 arg_list : arg
          | arg COMMA arg_list
@@ -217,8 +225,7 @@ arg : value
           }
           free($1);
         }
-    | CHAR_VAL
-        { if(parse_success) { char tmp[2] = {$1,'\0'}; append_output(tmp); } }
+    
 ;
 
 compute : value { free_expr($1); }
@@ -251,9 +258,49 @@ base : NUM_VAL
 %%
 
 void yyerror(const char *s) {
-    parse_success = 0;
-    fprintf(stderr, "\nError at line %d: %s\n", yylineno, s);
+    extern int yylineno;
+    extern char *yytext;
+
+    /* Detect if offending token is an operator */
+    if (yytext[0] == '+' || yytext[0] == '-' ||
+        yytext[0] == '*' || yytext[0] == '/') 
+    {
+        last_token_is_operator = 1;
+    }
+
+    if (last_token_is_operator) {
+        // Most specific: incomplete arithmetic
+        fprintf(stderr,
+            "Syntax Error at line %d: Incomplete arithmetic expression, operator '%s' has no right-hand operand.\n",
+            yylineno, yytext);
+
+        last_token_is_operator = 0;  // reset
+        return;
+    } 
+    else if (isalpha(yytext[0])) {
+        // After variable name, unexpected token
+        fprintf(stderr,
+            "Syntax Error at line %d: Expected assignment operator '=' or DOT after variable declaration, but found '%s'\n",
+            yylineno, yytext);
+        return;
+    } 
+    else if (strcmp(yytext, ".") != 0) {
+        // DOT missing at end
+        fprintf(stderr,
+            "Syntax Error at line %d: Missing DOT at the end of the previous statement.\n",
+            yylineno);
+        return;
+    } 
+    else {
+        // fallback generic syntax error
+        fprintf(stderr,
+            "Syntax Error at line %d: %s (near '%s')\n",
+            yylineno, s, yytext);
+        return;
+    }
 }
+
+
 
 int main() {
     parse_success = 1;
@@ -276,3 +323,4 @@ int main() {
 
     return 0;
 }
+//orig

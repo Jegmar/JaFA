@@ -4,12 +4,13 @@ entero age = 18, score = 95.
 entero solve = 2 * (2+5).
 
 letra s = 'a'.
-entero a = 10.
+entero a = 10 + 10.
 entero x = a + 2 * 5 / 3.
 
+x = x + 50.
 x addset 50.
 x mulset 2.
-x divset 6.
+x divset 6. 
 x subset 1.
 
 printa(x).
@@ -22,4 +23,8 @@ printa("Welcome to JaFA 2025!").
 printa(solve, " is the value of solve").
 printa().
 
-HUMAN END
+HUMAN 
+
+
+
+END
