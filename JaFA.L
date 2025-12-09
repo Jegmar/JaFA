@@ -15,7 +15,6 @@
 
 "SUGOD"         { return SUGOD; }
 "HUMAN"         { return HUMAN; }
-"END"           { return END; }
 
 "entero"        { return INT_TYPE; }
 "letra"         { return CHAR_TYPE; }
@@ -46,6 +45,7 @@
 
 "//".*          ;  /* ignore comments */
 
-.               { printf("Bad token at line %d: %s\n", yylineno, yytext); return BAD_TOKEN; }
+.               { printf("\nBad token at line %d: %s\n", yylineno, yytext); return BAD_TOKEN; }
 
 %%
+//orig

@@ -1,0 +1,5 @@
+.data
+a: .dword 0x0000000A
+.code
+DADDIU R1, R0, #10
+SD R1, a(R0)

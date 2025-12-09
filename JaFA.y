@@ -10,7 +10,6 @@
 
 int parse_success = 1; /* 1 = OK, 0 = error */
 int current_type = TYPE_INT;
-int last_token_is_operator = 0;
 
 extern int yylex();
 extern int yylineno;
@@ -65,7 +64,7 @@ extern char *yytext;
 }
 
 
-%token SUGOD HUMAN END BAD_TOKEN
+%token SUGOD HUMAN BAD_TOKEN
 %token INT_TYPE CHAR_TYPE
 %token <id> NAME
 %token <num> NUM_VAL
@@ -81,18 +80,21 @@ extern char *yytext;
 
 %%
 
-source : SUGOD flow HUMAN END
+source : SUGOD flow HUMAN
          { /* program successfully parsed */ }
 
 flow : /* empty */
      | flow step
      
 
-step : display DOT { if (parse_success) append_output("\n"); }
-     | setup DOT
-     | modify DOT
-     | compute DOT
-     ;
+step
+    : display DOT                { if (parse_success) append_output("\n"); }
+    | setup DOT
+    | modify DOT
+    | compute DOT
+    ;
+
+
 
 
 setup    : category batch
@@ -253,54 +255,17 @@ base : NUM_VAL
      | NAME
          { check_undefined($1, yylineno); $$ = mk_var($1); free($1); }
      | L_PAREN value R_PAREN { $$ = $2; }
+
      | SUB base { Expr *zero = mk_const(0); $$ = mk_bin(EX_SUB, zero, $2); }
 
 %%
 
+
 void yyerror(const char *s) {
-    extern int yylineno;
-    extern char *yytext;
+    parse_success = 0;
+    fprintf(stderr, "\nError at line %d: %s\n\nNOTE: Always put a DOT(.) at the end of every statement.\n", yylineno, s);
 
-    /* Detect if offending token is an operator */
-    if (yytext[0] == '+' || yytext[0] == '-' ||
-        yytext[0] == '*' || yytext[0] == '/') 
-    {
-        last_token_is_operator = 1;
-    }
-
-    if (last_token_is_operator) {
-        // Most specific: incomplete arithmetic
-        fprintf(stderr,
-            "Syntax Error at line %d: Incomplete arithmetic expression, operator '%s' has no right-hand operand.\n",
-            yylineno, yytext);
-
-        last_token_is_operator = 0;  // reset
-        return;
-    } 
-    else if (isalpha(yytext[0])) {
-        // After variable name, unexpected token
-        fprintf(stderr,
-            "Syntax Error at line %d: Expected assignment operator '=' or DOT after variable declaration, but found '%s'\n",
-            yylineno, yytext);
-        return;
-    } 
-    else if (strcmp(yytext, ".") != 0) {
-        // DOT missing at end
-        fprintf(stderr,
-            "Syntax Error at line %d: Missing DOT at the end of the previous statement.\n",
-            yylineno);
-        return;
-    } 
-    else {
-        // fallback generic syntax error
-        fprintf(stderr,
-            "Syntax Error at line %d: %s (near '%s')\n",
-            yylineno, s, yytext);
-        return;
-    }
 }
-
-
 
 int main() {
     parse_success = 1;
@@ -309,15 +274,15 @@ int main() {
 
     if(parse_success && result == 0) {
         printf("%s", output_buffer);
-        printf("\nProgram parsed successfully!\n\n");
+        //printf("\nProgram parsed successfully!\n\n");
 
-        printf("Assembly code:\n");
+        printf("Assembly code:\n\n");
         printf(".data\n%s", data_buffer);
         printf(".code\n%s\n", assembly_buffer);
 
-        printf("Machine code:\n%s\n", machine_buffer);
+        printf("Machine code:\n\n%s\n", machine_buffer);
     } else {
-        fprintf(stderr, "Parsing terminated due to error.\n");
+        //fprintf(stderr, "\nParsing terminated due to error.\n\n");
         return 1;
     }
 

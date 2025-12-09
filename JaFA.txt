@@ -1,13 +1,21 @@
 SUGOD
 
+entero q.
+entero p. p = 10 + q.
+printa("value of p: ",p).
+
 entero age = 18, score = 95.
 entero solve = 2 * (2+5).
+entero john.
+
+printa(john).
 
 letra s = 'a'.
+s addset 1.
+printa(s).
 entero a = 10 + 10.
-entero x = a + 2 * 5 / 3.
+entero x = a + age * (2 * 5) / 3.
 
-x = x + 50.
 x addset 50.
 x mulset 2.
 x divset 6. 
@@ -22,9 +30,6 @@ printa("Double score: ", score * 2).
 printa("Welcome to JaFA 2025!").
 printa(solve, " is the value of solve").
 printa().
+//comment
 
-HUMAN 
-
-
-
-END
+HUMAN

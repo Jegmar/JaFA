@@ -24,7 +24,7 @@ int find_var(const char *name) {
 
 int add_var(const char *name, int type) {
     if (var_count >= MAX_VARS) {
-        fprintf(stderr, "\nSemantic error: Too many variables\n");
+        fprintf(stderr, "\nError: semantic error.\n Too many variables.\n");
         exit(1);
     }
     sym_table[var_count].name = strdup(name);
@@ -36,21 +36,21 @@ int add_var(const char *name, int type) {
 /* ---------------- Semantic Checks ---------------- */
 void check_undefined(char *name, int line_no) {
     if (find_var(name) == -1) {
-        fprintf(stderr, "\nSemantic error at line %d: Undefined variable '%s'\n", line_no, name);
+        fprintf(stderr, "\nError at line %d: semantic error.\nUndefined variable '%s'.\n", line_no, name);
         exit(1);
     }
 }
 
 void check_division(int divisor, int line_no) {
     if (divisor == 0) {
-        fprintf(stderr, "\nSemantic error at line %d: Division by zero\n", line_no);
+        fprintf(stderr, "\nError at line %d: semantic error.\nDivision by zero.\n", line_no);
         exit(1);
     }
 }
 
 void check_non_negative(int value, char *var_name, int line_no) {
     if (value < 0) {
-        fprintf(stderr, "\nSemantic error at line %d: Variable '%s' cannot be negative\n", line_no, var_name);
+        fprintf(stderr, "\nError at line %d: semantic error.\nVariable '%s' cannot be negative.\n", line_no, var_name);
         exit(1);
     }
 }
@@ -81,7 +81,7 @@ void check_expr_type(Expr *expr, int expected_type) {
             int var_type = sym_table[idx].type;
             if (var_type != expected_type) {
                 fprintf(stderr,
-                    "\nSemantic error at line %d: variable '%s' of type '%s' cannot be used in a %s expression.\n"
+                    "\nError at line %d: semantic error.\nVariable '%s' of type '%s' cannot be used in a %s expression.\n"
                     "Hint: variables of type '%s' cannot be mixed in expressions of type '%s'.\n\n",
                     yylineno,
                     expr->name,

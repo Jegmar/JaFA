@@ -35,7 +35,7 @@
 /* "%code requires" blocks.  */
 
 /* Line 1676 of yacc.c  */
-#line 54 "JaFA.y"
+#line 53 "JaFA.y"
 
     #include "ast.h"
 
@@ -52,28 +52,27 @@
    enum yytokentype {
      SUGOD = 258,
      HUMAN = 259,
-     END = 260,
-     BAD_TOKEN = 261,
-     INT_TYPE = 262,
-     CHAR_TYPE = 263,
-     NAME = 264,
-     NUM_VAL = 265,
-     CHAR_VAL = 266,
-     STRING_VAL = 267,
-     SET = 268,
-     ADD_SET = 269,
-     SUB_SET = 270,
-     MUL_SET = 271,
-     DIV_SET = 272,
-     ADD = 273,
-     SUB = 274,
-     MUL = 275,
-     DIV = 276,
-     L_PAREN = 277,
-     R_PAREN = 278,
-     COMMA = 279,
-     DOT = 280,
-     SHOW = 281
+     BAD_TOKEN = 260,
+     INT_TYPE = 261,
+     CHAR_TYPE = 262,
+     NAME = 263,
+     NUM_VAL = 264,
+     CHAR_VAL = 265,
+     STRING_VAL = 266,
+     SET = 267,
+     ADD_SET = 268,
+     SUB_SET = 269,
+     MUL_SET = 270,
+     DIV_SET = 271,
+     ADD = 272,
+     SUB = 273,
+     MUL = 274,
+     DIV = 275,
+     L_PAREN = 276,
+     R_PAREN = 277,
+     COMMA = 278,
+     DOT = 279,
+     SHOW = 280
    };
 #endif
 
@@ -84,7 +83,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 58 "JaFA.y"
+#line 57 "JaFA.y"
 
     int num;
     char ch;
@@ -96,7 +95,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 100 "JaFA.tab.h"
+#line 99 "JaFA.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

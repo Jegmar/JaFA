@@ -7,7 +7,7 @@ Grammar
 
     0 $accept: source $end
 
-    1 source: SUGOD flow HUMAN END
+    1 source: SUGOD flow HUMAN
 
     2 flow: /* empty */
     3     | flow step
@@ -70,67 +70,66 @@ $end (0) 0
 error (256)
 SUGOD (258) 1
 HUMAN (259) 1
-END (260) 1
-BAD_TOKEN (261)
-INT_TYPE (262) 9
-CHAR_TYPE (263) 10
-NAME (264) 13 14 15 37
-NUM_VAL (265) 35
-CHAR_VAL (266) 36
-STRING_VAL (267) 26
-SET (268) 14 16
-ADD_SET (269) 17
-SUB_SET (270) 18
-MUL_SET (271) 19
-DIV_SET (272) 20
-ADD (273) 30
-SUB (274) 31 39
-MUL (275) 33
-DIV (276) 34
-L_PAREN (277) 21 22 38
-R_PAREN (278) 21 22 38
-COMMA (279) 12 24
-DOT (280) 4 5 6 7
-SHOW (281) 21 22
+BAD_TOKEN (260)
+INT_TYPE (261) 9
+CHAR_TYPE (262) 10
+NAME (263) 13 14 15 37
+NUM_VAL (264) 35
+CHAR_VAL (265) 36
+STRING_VAL (266) 26
+SET (267) 14 16
+ADD_SET (268) 17
+SUB_SET (269) 18
+MUL_SET (270) 19
+DIV_SET (271) 20
+ADD (272) 30
+SUB (273) 31 39
+MUL (274) 33
+DIV (275) 34
+L_PAREN (276) 21 22 38
+R_PAREN (277) 21 22 38
+COMMA (278) 12 24
+DOT (279) 4 5 6 7
+SHOW (280) 21 22
 
 
 Nonterminals, with rules where they appear
 
-$accept (27)
+$accept (26)
     on left: 0
-source (28)
+source (27)
     on left: 1, on right: 0
-flow (29)
+flow (28)
     on left: 2 3, on right: 1 3
-step (30)
+step (29)
     on left: 4 5 6 7, on right: 3
-setup (31)
+setup (30)
     on left: 8, on right: 5
-category (32)
+category (31)
     on left: 9 10, on right: 8
-batch (33)
+batch (32)
     on left: 11 12, on right: 8 12
-item (34)
+item (33)
     on left: 13 14, on right: 11 12
-modify (35)
+modify (34)
     on left: 15, on right: 6
-mode (36)
+mode (35)
     on left: 16 17 18 19 20, on right: 15
-display (37)
+display (36)
     on left: 21 22, on right: 4
-arg_list (38)
+arg_list (37)
     on left: 23 24, on right: 22 24
-arg (39)
+arg (38)
     on left: 25 26, on right: 23 24
-compute (40)
+compute (39)
     on left: 27, on right: 7
-value (41)
+value (40)
     on left: 28, on right: 14 15 25 27 38
-combine (42)
+combine (41)
     on left: 29 30 31, on right: 28 30 31
-factor (43)
+factor (42)
     on left: 32 33 34, on right: 29 30 31 33 34
-base (44)
+base (43)
     on left: 35 36 37 38 39, on right: 32 33 34 39
 
 
@@ -145,7 +144,7 @@ state 0
 
 state 1
 
-    1 source: SUGOD . flow HUMAN END
+    1 source: SUGOD . flow HUMAN
 
     $default  reduce using rule 2 (flow)
 
@@ -161,7 +160,7 @@ state 2
 
 state 3
 
-    1 source: SUGOD flow . HUMAN END
+    1 source: SUGOD flow . HUMAN
     3 flow: flow . step
 
     HUMAN      shift, and go to state 5
@@ -195,9 +194,9 @@ state 4
 
 state 5
 
-    1 source: SUGOD flow HUMAN . END
+    1 source: SUGOD flow HUMAN .
 
-    END  shift, and go to state 24
+    $default  reduce using rule 1 (source)
 
 
 state 6
@@ -219,15 +218,15 @@ state 8
    15 modify: NAME . mode value
    37 base: NAME .
 
-    SET      shift, and go to state 25
-    ADD_SET  shift, and go to state 26
-    SUB_SET  shift, and go to state 27
-    MUL_SET  shift, and go to state 28
-    DIV_SET  shift, and go to state 29
+    SET      shift, and go to state 24
+    ADD_SET  shift, and go to state 25
+    SUB_SET  shift, and go to state 26
+    MUL_SET  shift, and go to state 27
+    DIV_SET  shift, and go to state 28
 
     $default  reduce using rule 37 (base)
 
-    mode  go to state 30
+    mode  go to state 29
 
 
 state 9
@@ -248,26 +247,26 @@ state 11
 
    39 base: SUB . base
 
-    NAME      shift, and go to state 31
+    NAME      shift, and go to state 30
     NUM_VAL   shift, and go to state 9
     CHAR_VAL  shift, and go to state 10
     SUB       shift, and go to state 11
     L_PAREN   shift, and go to state 12
 
-    base  go to state 32
+    base  go to state 31
 
 
 state 12
 
    38 base: L_PAREN . value R_PAREN
 
-    NAME      shift, and go to state 31
+    NAME      shift, and go to state 30
     NUM_VAL   shift, and go to state 9
     CHAR_VAL  shift, and go to state 10
     SUB       shift, and go to state 11
     L_PAREN   shift, and go to state 12
 
-    value    go to state 33
+    value    go to state 32
     combine  go to state 21
     factor   go to state 22
     base     go to state 23
@@ -278,7 +277,7 @@ state 13
    21 display: SHOW . L_PAREN R_PAREN
    22        | SHOW . L_PAREN arg_list R_PAREN
 
-    L_PAREN  shift, and go to state 34
+    L_PAREN  shift, and go to state 33
 
 
 state 14
@@ -292,38 +291,38 @@ state 15
 
     5 step: setup . DOT
 
-    DOT  shift, and go to state 35
+    DOT  shift, and go to state 34
 
 
 state 16
 
     8 setup: category . batch
 
-    NAME  shift, and go to state 36
+    NAME  shift, and go to state 35
 
-    batch  go to state 37
-    item   go to state 38
+    batch  go to state 36
+    item   go to state 37
 
 
 state 17
 
     6 step: modify . DOT
 
-    DOT  shift, and go to state 39
+    DOT  shift, and go to state 38
 
 
 state 18
 
     4 step: display . DOT
 
-    DOT  shift, and go to state 40
+    DOT  shift, and go to state 39
 
 
 state 19
 
     7 step: compute . DOT
 
-    DOT  shift, and go to state 41
+    DOT  shift, and go to state 40
 
 
 state 20
@@ -339,8 +338,8 @@ state 21
    30 combine: combine . ADD factor
    31        | combine . SUB factor
 
-    ADD  shift, and go to state 42
-    SUB  shift, and go to state 43
+    ADD  shift, and go to state 41
+    SUB  shift, and go to state 42
 
     $default  reduce using rule 28 (value)
 
@@ -351,8 +350,8 @@ state 22
    33 factor: factor . MUL base
    34       | factor . DIV base
 
-    MUL  shift, and go to state 44
-    DIV  shift, and go to state 45
+    MUL  shift, and go to state 43
+    DIV  shift, and go to state 44
 
     $default  reduce using rule 29 (combine)
 
@@ -366,164 +365,171 @@ state 23
 
 state 24
 
-    1 source: SUGOD flow HUMAN END .
-
-    $default  reduce using rule 1 (source)
-
-
-state 25
-
    16 mode: SET .
 
     $default  reduce using rule 16 (mode)
 
 
-state 26
+state 25
 
    17 mode: ADD_SET .
 
     $default  reduce using rule 17 (mode)
 
 
-state 27
+state 26
 
    18 mode: SUB_SET .
 
     $default  reduce using rule 18 (mode)
 
 
-state 28
+state 27
 
    19 mode: MUL_SET .
 
     $default  reduce using rule 19 (mode)
 
 
-state 29
+state 28
 
    20 mode: DIV_SET .
 
     $default  reduce using rule 20 (mode)
 
 
-state 30
+state 29
 
    15 modify: NAME mode . value
 
-    NAME      shift, and go to state 31
+    NAME      shift, and go to state 30
     NUM_VAL   shift, and go to state 9
     CHAR_VAL  shift, and go to state 10
     SUB       shift, and go to state 11
     L_PAREN   shift, and go to state 12
 
-    value    go to state 46
+    value    go to state 45
     combine  go to state 21
     factor   go to state 22
     base     go to state 23
 
 
-state 31
+state 30
 
    37 base: NAME .
 
     $default  reduce using rule 37 (base)
 
 
-state 32
+state 31
 
    39 base: SUB base .
 
     $default  reduce using rule 39 (base)
 
 
-state 33
+state 32
 
    38 base: L_PAREN value . R_PAREN
 
-    R_PAREN  shift, and go to state 47
+    R_PAREN  shift, and go to state 46
 
 
-state 34
+state 33
 
    21 display: SHOW L_PAREN . R_PAREN
    22        | SHOW L_PAREN . arg_list R_PAREN
 
-    NAME        shift, and go to state 31
+    NAME        shift, and go to state 30
     NUM_VAL     shift, and go to state 9
     CHAR_VAL    shift, and go to state 10
-    STRING_VAL  shift, and go to state 48
+    STRING_VAL  shift, and go to state 47
     SUB         shift, and go to state 11
     L_PAREN     shift, and go to state 12
-    R_PAREN     shift, and go to state 49
+    R_PAREN     shift, and go to state 48
 
-    arg_list  go to state 50
-    arg       go to state 51
-    value     go to state 52
+    arg_list  go to state 49
+    arg       go to state 50
+    value     go to state 51
     combine   go to state 21
     factor    go to state 22
     base      go to state 23
 
 
-state 35
+state 34
 
     5 step: setup DOT .
 
     $default  reduce using rule 5 (step)
 
 
-state 36
+state 35
 
    13 item: NAME .
    14     | NAME . SET value
 
-    SET  shift, and go to state 53
+    SET  shift, and go to state 52
 
     $default  reduce using rule 13 (item)
 
 
-state 37
+state 36
 
     8 setup: category batch .
 
     $default  reduce using rule 8 (setup)
 
 
-state 38
+state 37
 
    11 batch: item .
    12      | item . COMMA batch
 
-    COMMA  shift, and go to state 54
+    COMMA  shift, and go to state 53
 
     $default  reduce using rule 11 (batch)
 
 
-state 39
+state 38
 
     6 step: modify DOT .
 
     $default  reduce using rule 6 (step)
 
 
-state 40
+state 39
 
     4 step: display DOT .
 
     $default  reduce using rule 4 (step)
 
 
-state 41
+state 40
 
     7 step: compute DOT .
 
     $default  reduce using rule 7 (step)
 
 
-state 42
+state 41
 
    30 combine: combine ADD . factor
 
-    NAME      shift, and go to state 31
+    NAME      shift, and go to state 30
+    NUM_VAL   shift, and go to state 9
+    CHAR_VAL  shift, and go to state 10
+    SUB       shift, and go to state 11
+    L_PAREN   shift, and go to state 12
+
+    factor  go to state 54
+    base    go to state 23
+
+
+state 42
+
+   31 combine: combine SUB . factor
+
+    NAME      shift, and go to state 30
     NUM_VAL   shift, and go to state 9
     CHAR_VAL  shift, and go to state 10
     SUB       shift, and go to state 11
@@ -535,23 +541,22 @@ state 42
 
 state 43
 
-   31 combine: combine SUB . factor
+   33 factor: factor MUL . base
 
-    NAME      shift, and go to state 31
+    NAME      shift, and go to state 30
     NUM_VAL   shift, and go to state 9
     CHAR_VAL  shift, and go to state 10
     SUB       shift, and go to state 11
     L_PAREN   shift, and go to state 12
 
-    factor  go to state 56
-    base    go to state 23
+    base  go to state 56
 
 
 state 44
 
-   33 factor: factor MUL . base
+   34 factor: factor DIV . base
 
-    NAME      shift, and go to state 31
+    NAME      shift, and go to state 30
     NUM_VAL   shift, and go to state 9
     CHAR_VAL  shift, and go to state 10
     SUB       shift, and go to state 11
@@ -562,174 +567,161 @@ state 44
 
 state 45
 
-   34 factor: factor DIV . base
-
-    NAME      shift, and go to state 31
-    NUM_VAL   shift, and go to state 9
-    CHAR_VAL  shift, and go to state 10
-    SUB       shift, and go to state 11
-    L_PAREN   shift, and go to state 12
-
-    base  go to state 58
-
-
-state 46
-
    15 modify: NAME mode value .
 
     $default  reduce using rule 15 (modify)
 
 
-state 47
+state 46
 
    38 base: L_PAREN value R_PAREN .
 
     $default  reduce using rule 38 (base)
 
 
-state 48
+state 47
 
    26 arg: STRING_VAL .
 
     $default  reduce using rule 26 (arg)
 
 
-state 49
+state 48
 
    21 display: SHOW L_PAREN R_PAREN .
 
     $default  reduce using rule 21 (display)
 
 
-state 50
+state 49
 
    22 display: SHOW L_PAREN arg_list . R_PAREN
 
-    R_PAREN  shift, and go to state 59
+    R_PAREN  shift, and go to state 58
 
 
-state 51
+state 50
 
    23 arg_list: arg .
    24         | arg . COMMA arg_list
 
-    COMMA  shift, and go to state 60
+    COMMA  shift, and go to state 59
 
     $default  reduce using rule 23 (arg_list)
 
 
-state 52
+state 51
 
    25 arg: value .
 
     $default  reduce using rule 25 (arg)
 
 
-state 53
+state 52
 
    14 item: NAME SET . value
 
-    NAME      shift, and go to state 31
+    NAME      shift, and go to state 30
     NUM_VAL   shift, and go to state 9
     CHAR_VAL  shift, and go to state 10
     SUB       shift, and go to state 11
     L_PAREN   shift, and go to state 12
 
-    value    go to state 61
+    value    go to state 60
     combine  go to state 21
     factor   go to state 22
     base     go to state 23
 
 
-state 54
+state 53
 
    12 batch: item COMMA . batch
 
-    NAME  shift, and go to state 36
+    NAME  shift, and go to state 35
 
-    batch  go to state 62
-    item   go to state 38
+    batch  go to state 61
+    item   go to state 37
 
 
-state 55
+state 54
 
    30 combine: combine ADD factor .
    33 factor: factor . MUL base
    34       | factor . DIV base
 
-    MUL  shift, and go to state 44
-    DIV  shift, and go to state 45
+    MUL  shift, and go to state 43
+    DIV  shift, and go to state 44
 
     $default  reduce using rule 30 (combine)
 
 
-state 56
+state 55
 
    31 combine: combine SUB factor .
    33 factor: factor . MUL base
    34       | factor . DIV base
 
-    MUL  shift, and go to state 44
-    DIV  shift, and go to state 45
+    MUL  shift, and go to state 43
+    DIV  shift, and go to state 44
 
     $default  reduce using rule 31 (combine)
 
 
-state 57
+state 56
 
    33 factor: factor MUL base .
 
     $default  reduce using rule 33 (factor)
 
 
-state 58
+state 57
 
    34 factor: factor DIV base .
 
     $default  reduce using rule 34 (factor)
 
 
-state 59
+state 58
 
    22 display: SHOW L_PAREN arg_list R_PAREN .
 
     $default  reduce using rule 22 (display)
 
 
-state 60
+state 59
 
    24 arg_list: arg COMMA . arg_list
 
-    NAME        shift, and go to state 31
+    NAME        shift, and go to state 30
     NUM_VAL     shift, and go to state 9
     CHAR_VAL    shift, and go to state 10
-    STRING_VAL  shift, and go to state 48
+    STRING_VAL  shift, and go to state 47
     SUB         shift, and go to state 11
     L_PAREN     shift, and go to state 12
 
-    arg_list  go to state 63
-    arg       go to state 51
-    value     go to state 52
+    arg_list  go to state 62
+    arg       go to state 50
+    value     go to state 51
     combine   go to state 21
     factor    go to state 22
     base      go to state 23
 
 
-state 61
+state 60
 
    14 item: NAME SET value .
 
     $default  reduce using rule 14 (item)
 
 
-state 62
+state 61
 
    12 batch: item COMMA batch .
 
     $default  reduce using rule 12 (batch)
 
 
-state 63
+state 62
 
    24 arg_list: arg COMMA arg_list .
 
