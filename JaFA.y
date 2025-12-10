@@ -168,15 +168,43 @@ modify : NAME mode value
              if(!parse_success) YYABORT;
              check_undefined($1, yylineno);
              int idx = find_var($1);
-             int new_val = eval_expr($3);  /* evaluate expression */
+
+             /* === TYPE CHECK: only entero allowed for addset/etc === */
+             if (sym_table[idx].type != TYPE_INT) {
+                 fprintf(stderr, "\nError at line %d: Only 'entero' variables can use addset/subset/mulset/divset.\n", yylineno);
+                 parse_success = 0;
+                 YYABORT;
+             }
+
+             /* === GENERATE ASSEMBLY + MACHINE CODE === */
+             generate_modify_with_expr($1, $2, $3);
+
+             /* === UPDATE SYMBOL TABLE VALUE (for printa) === */
+             int new_val = eval_expr($3);
              switch($2) {
-                 case SET:     break; /* already stored */
-                 case ADD_SET: new_val += sym_table[idx].value; break;
-                 case SUB_SET: new_val = sym_table[idx].value - new_val; break;
-                 case MUL_SET: new_val *= sym_table[idx].value; break;
-                 case DIV_SET: check_division($3->value, yylineno); new_val = sym_table[idx].value / eval_expr($3); break;
+                 case SET: 
+                     new_val = new_val; /* just assign */
+                     break;
+                 case ADD_SET: 
+                     new_val = sym_table[idx].value + new_val; 
+                     break;
+                 case SUB_SET: 
+                     new_val = sym_table[idx].value - new_val; 
+                     break;
+                 case MUL_SET: 
+                     new_val = sym_table[idx].value * new_val; 
+                     break;
+                 case DIV_SET: 
+                     if (new_val == 0) {
+                         fprintf(stderr, "\nError at line %d: Division by zero in divset.\n", yylineno);
+                         parse_success = 0;
+                         YYABORT;
+                     }
+                     new_val = sym_table[idx].value / new_val; 
+                     break;
              }
              sym_table[idx].value = new_val;
+
              free($1);
              free_expr($3);
          }

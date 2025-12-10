@@ -6,6 +6,8 @@
 #include "ast.h"
 #include "semantics.h"   // brings in Variable sym_table[] and find_var()
 
+#include "JaFA.tab.h"
+
 char data_buffer[65536];
 char assembly_buffer[65536];
 char machine_buffer[65536];
@@ -181,4 +183,66 @@ void generate_letra_with_expr(const char* name, Expr* expr) {
     sprintf(line, "SB R%d, %s(R0)\n", r, name);
     append_asm(line);
     emit_machine("SB", 0, 0, r, get_symbol_addr(name));
+}
+/* NEW FUNCTION: Generate code for x +=, x -=, x *=, x /= */
+void generate_modify_with_expr(const char* name, int mode, Expr* expr) {
+    int addr = get_symbol_addr(name);
+    int idx = find_var(name);
+
+    // Step 1: Load current value of variable
+    int r_old = next_reg();
+    char line[256];
+    sprintf(line, "LD R%d, %s(R0)\n", r_old, name);
+    append_asm(line);
+    emit_machine("LD", 0, 0, r_old, addr);
+
+    // Step 2: Compute the right-hand side expression
+    int r_right = generate_expr_code(expr);
+
+    // Step 3: Apply the operation
+    int r_result = next_reg();
+
+    if (mode == ADD_SET) {
+        sprintf(line, "DADDU R%d, R%d, R%d\n", r_result, r_old, r_right);
+        append_asm(line);
+        emit_machine("DADDU", r_result, r_old, r_right, 0);
+    }
+    else if (mode == SUB_SET) {
+        sprintf(line, "DSUBU R%d, R%d, R%d\n", r_result, r_old, r_right);
+        append_asm(line);
+        emit_machine("DSUBU", r_result, r_old, r_right, 0);
+    }
+    else if (mode == MUL_SET) {
+        sprintf(line, "DMULTU R%d, R%d\n", r_old, r_right);
+        append_asm(line);
+        emit_machine("DMULTU", 0, r_old, r_right, 0);
+        sprintf(line, "MFLO R%d\n", r_result);
+        append_asm(line);
+        emit_machine("MFLO", r_result, 0, 0, 0);
+    }
+    else if (mode == DIV_SET) {
+        sprintf(line, "DDIVU R%d, R%d\n", r_old, r_right);
+        append_asm(line);
+        emit_machine("DDIVU", 0, r_old, r_right, 0);
+        sprintf(line, "MFLO R%d\n", r_result);
+        append_asm(line);
+        emit_machine("MFLO", r_result, 0, 0, 0);
+    }
+    else { // SET (regular assignment)
+        r_result = r_right;  // just use the computed value
+    }
+
+    // Step 4: Store result back to variable
+    sprintf(line, "SD R%d, %s(R0)\n", r_result, name);
+    append_asm(line);
+    emit_machine("SD", 0, 0, r_result, addr);
+
+    // Update symbol table (for printa)
+    int new_val = eval_expr(expr);
+    if (mode == ADD_SET) new_val = sym_table[idx].value + new_val;
+    else if (mode == SUB_SET) new_val = sym_table[idx].value - new_val;
+    else if (mode == MUL_SET) new_val = sym_table[idx].value * new_val;
+    else if (mode == DIV_SET) new_val = sym_table[idx].value / new_val;
+
+    sym_table[idx].value = new_val;
 }

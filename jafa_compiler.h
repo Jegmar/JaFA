@@ -14,6 +14,8 @@ void generate_entero_with_expr(const char* name, Expr *expr);
 void generate_letra(const char* name, char c);
 void generate_letra_with_expr(const char* name, Expr *expr);
 
+void generate_modify_with_expr(const char* name, int mode, Expr* expr);
+
 // Declare variables directly (with optional initial value)
 void declare_entero(const char* name, int init_val);
 void declare_letra(const char* name, int init_val);
